@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="calc">
+    <div class="expression"></div>
+    <div class="result"></div>
+    <div class="box">
+      <div class="clear">C</div>
+      <div class="percent">%</div>
+      <div class="delete">del</div>
+      <div class="symbol">/</div>
+      <div class="num">7</div>
+      <div class="num">8</div>
+      <div class="num">9</div>
+      <div class="symbol">*</div>
+      <div class="num">4</div>
+      <div class="num">5</div>
+      <div class="num">6</div>
+      <div class="symbol">-</div>
+      <div class="num">1</div>
+      <div class="num">2</div>
+      <div class="num">3</div>
+      <div class="symbol">+</div>
+      <div class="num">+/-</div>
+      <div class="num">0</div>
+      <div class="num">.</div>
+      <div class="equal">=</div>
+
+    </div>
+  </div>
+  <script src="./index.js"></script>
+  <script>
+    const expression= document.getElementsByClassName("expression")[0];
+    const result= document.getElementsByClassName("result")[0];
+    const del= document.getElementsByClassName("delete")[0];
+    const equal= document.getElementsByClassName("equal")[0];
+    const clear= document.getElementsByClassName("clear")[0];
+    const percent= document.getElementsByClassName("percent")[0];
+    const symbol= document.getElementsByClassName("symbol");
+    const num= document.getElementsByClassName("num");
+
+    let num1="",num2="",sym;
+    let arr = [];
+    for (let i = 0; i < num.length; i++) {
+      num[i].onclick= function() {
+        if (sym) {
+          num2 += num[i].innerText;  
+        }else{
+          num1 += num[i].innerText;
+        };
+        //console.log(num1);
+        expression.innerText= num1 || num2;
+      };
+    };
+    for (let i = 0; i < symbol.length; i++) {
+      symbol[i].onclick= function() {
+        let index = arr.length-1;
+        if (sym) {
+          //有值才可以push数字，undefined不推
+          num2 && arr.push(num2);
+          num2= "";
+        }else{
+          num1 && arr.push(num1);
+          num1= "";
+        };
+        sym= symbol[i].innerText;
+        // if (sym === arr[index]) {
+        //   arr.pop();
+        //   console.log(1)
+        //   console.log(arr)
+        // }
+        arr.push(sym);
+        //之后必须
+        console.log(arr);
+      };
+    };
+    equal.onclick=function() {
+      arr.push(num2);
+      console.log(arr)
+      let exp = arr.join("");
+      let res =compute(arr);
+      result.innerText= res;
+      expression.innerText= exp;
+      arr=[];
+      num1="";
+      num2="";
+      sym= "";
+    }  
+      
+    clear.onclick=function() {
+      arr=[];
+      num1="";
+      num2="";
+      sym= "";
+      result.innerText= "";
+      expression.innerText= "";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+
+.container {
+  background-color: #eee;
+  position: relative;
+}
+
+.nav {
+  position: fixed;
+  left: 0;
+  padding: 0 1rem;
+  width: 100vw;
+  line-height: 3rem;
+  height: 3rem;
+  background-color: #fff;
+  z-index: 999;
+}
+
+.nav_icon {
+  margin-right: 1rem;
+  font-size: 22px;
+  color: blue;
+}
+.Menu_item_text {
+  display: inline-block;
+  text-align: right;
+  margin-left: 1.8rem;
+}
+.com_main {
+  width: 100%;
+  max-width: 1100px;
+  padding-top: 4rem;
+  margin: 0 auto;
+}
+.comm_right, .com_left {
+  background-color: #fff;
+}
+.com_left {
+
+}
+.comm_right {
+  margin-left: 1.8rem;
+  background-color: #fff;
+}

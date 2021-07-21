@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .box{
+      width: 200px;
+      height: 200px;
+      border: 1px solid greenyellow;
+      margin: 100px auto;
+      position: relative;
+    }
+    .square{
+      position: absolute;
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+
+  </div>
+  <script src="./animation.js"></script>
+  <script>
+    let box = document.getElementsByClassName("box")[0];
+    let arr = [],j=0;
+    //let div;
+    let numLef= 10,numTo= 10;
+    let sw= 20,sh= 20;
+    for (let i = 0; i < 100; i++) {
+      arr.push(i);
+    };
+    arr.sort(() => {
+      return (Math.random() - 0.5)
+    });
+    fly();
+    function fly() {
+      //console.log(j<100);
+      let num= arr[j];
+      if (j<100) {
+        let left= (num % numLef)*sw;
+        let top= parseInt(num/numLef)*sh;
+
+        console.log(left,top)
+
+        let div= document.createElement("div");
+        div.className= "square";
+        div.style.background= `url("./img.jpg") -${left}px -${top}px`;
+        box.appendChild(div);
+
+        animation( div,{
+          data: {
+            left: left,
+            top: top
+          }
+        },100,function() {
+          j++;
+          fly();
+        } );
+      };
+      
+    };
+    //console.log(div);
+    console.log(arr);
+    
+  </script>
+</body>
+</html>

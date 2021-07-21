@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function Abc() {
+      this.name= "abc";
+      this.b= "bb";
+      //this.name.a= this.b;
+      //this.c= null;
+    };
+    Abc.prototype.init= function () {
+      this.name.next= this.b;
+      this.c= this.b;
+      this.b.front= this.name;
+    };
+    Abc.prototype.creat= function () {
+      //console.log(abc);
+      console.log(this);
+      this.obb.mo.call(this);
+    }
+    Abc.prototype.obb= {
+      mo() {
+        console.log(this);
+        console.log(this.name.next);
+      }
+    }
+    let abc= new Abc();
+    abc.init();
+    abc.creat();
+
+    document.onkeydown= function(ev) {
+      console.log(ev)
+    }
+
+  </script>
+</body>
+</html>

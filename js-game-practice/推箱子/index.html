@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset = "UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>萧逸制作</title>
+    <style>
+    
+        *{
+            margin:0;
+            padding:0;
+        }
+        body{
+            overflow: hidden;
+        }
+        
+        #wrap{
+            position: relative;
+            /* width:560px;
+            height:560px;
+            border:1px solid #000;    */
+            margin:50px auto;
+            background-image: url('./img/block.gif');
+        }
+        #wrap div{
+            position:absolute;
+            width:35px;
+            height:35px;
+        }
+
+        /* #wrap div.box */
+
+        #wrap div img{
+            position:absolute;
+            bottom:0;
+        }
+        #wrap div.ball img{
+            left:50%;
+            top:50%;
+            margin-left:-15px;
+            margin-top:-15px;
+            /* z-index: 0; */
+        }
+        #wrap div.person img{
+            left:50%;
+            margin-left:-25px;
+        }
+        .bt{
+            position: absolute;
+            right: 130px;
+            top: 20px;
+            cursor: pointer;
+
+        }
+        .left{
+            right : 180px;
+        }
+        .preve{
+            right : 230px;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div id='wrap'></div>
+    <button class = 'bt'id = 'bt'>下一关</button>
+    <button class = 'bt left' id = 'leftBt'>上一关</button>
+    <button class = 'bt preve' id = 'preve'>上一步</button>
+    <!-- <img src='..'/> -->
+    <script>
+
+        window.onload = function () {
+            game.exe()
+            
+                
+        }    
+        
+        
+
+        let game = {
+            owrap : document.getElementById( "wrap" ),
+            level : 0,
+            size : { x : 16 ,y : 16 },//地图的面积
+            exe () {//执行 创建地图,点击事件的预处理,
+                //this.level ++
+                this.creatMap( this.level )
+                bt.onclick = () => {
+                    if ( game.level < game.data.length -1 ) { //关卡的级别
+                        game.level ++
+                    }else{
+                        //game.level = 0
+                        alert("通关啦!")
+                    }
+                    game.exe()//在点击后lv的地图不同
+
+                //console.log(game.level)
+                }
+                leftBt.onclick = () => {
+                    if ( game.level >0 ) {
+                        game.level --
+                    }else{
+                        alert( '已经是第一关了!' )
+                    }
+                    game.exe()//上一关的地图渲染
+
+                //console.log(game.level)
+                }
+                preve.onclick = this.preve//设置事件代理
+            },
+            creatMap : function ( lv ) {//创建地图的步骤
+                this.owrap.innerHTML = ""; //首先对每一次创建时,先清除上一次的地图
+                this.stepdate.person = [] //同理,这是标记人的位置
+                this.stepdate.box = []  //标记盒子的位置
+                this.stepnum = 0  // 步数
+                //先给最大的地图轮廓的盒子定义  宽高
+                this.owrap.style.cssText = `width:${this.size.x*35}px;height: ${this.size.y*35}px`
+                //console.log(this)
+                let odiv,oimg,operson;//初始化一个值
+                //console.log( this.size.x * this.size.y)
+                
+                for (let i = 0,len = this.size.x * this.size.y; i < len; i++) {
+                    //odiv = document.createElement( "div" )
+                    switch ( this.data[ lv ][i] ) {//关卡lv 序列号i
+                        case 1://树
+                            creatediv.call( this,i ) //call 改变this指向
+                            odiv.className = "tree" //赋予名称
+                            oimg.src = "img/wall.png"//给图片
+                            // console.log(this)
+                            break;
+                        case 2://球
+                            creatediv.call( this,i )
+                            odiv.className = "ball"
+                            odiv.style.zIndex = 0
+                            oimg.src = "img/ball.png"
+                            
+                            break;
+                        case 3://箱子
+                            creatediv.call( this,i )
+                            odiv.className = "box"
+                            oimg.src = "img/box.png"
+                            break;
+                        case 4://人
+                            creatediv.call( this,i )
+                            odiv.className = "person"
+                            oimg.src = "img/down.png"
+
+                            operson = oimg  //定义个值operson保存 当前img标签
+                            //console.log( operson )
+                            break; 
+                    }          
+                    
+                };
+                function creatediv ( i ) { //创造
+                    //for循环 把0至(16*16-1)个数 分别排列位置
+                    let x = i % this.size.x   //0-16  保持每一行16个 设置x(距离左边)left值
+                    let y = parseInt( i / this.size.x )//当序列号为16,或大于16,设置y(距离上边)top值
+
+                    odiv = document.createElement( "div" )
+                    //给与自定义属性 被标记
+                    odiv.x = x
+                    odiv.y = y
+
+                    oimg = new Image()//创造图片
+                    odiv.appendChild( oimg )
+
+                    odiv.style.cssText = `left:${ x * 35 }px;top:${ y * 35 }px;z-index : ${this.size.y * y}`
+                    odiv.style.zIndex = this.size.x * y + x//给每个div加层级
+                    
+                    this.owrap.appendChild( odiv )// call 使this 指向 wrap
+                    //console.log(this)
+                }
+                this.personlook( operson )//创造地图后给人的头朝向
+            },
+            personlook ( op ) {//人的朝向  op传参传入人的img标签属性
+                let that = game //定义that 为wrap
+                let person = op.parentNode //person 为 "人"的那个div
+                document.onkeydown = function ( e ) {
+                    e = e || window.event//兼容e
+                    //console.log( e.keyCode )
+                    //此数据为保存之前动作的行为
+                    that.stepdate.person[ that.stepnum ] = {}//记录人所有的行为,保存在对象中
+                    that.stepdate.person[ that.stepnum ].src = op.src //保存人的头朝向的记录
+                    //console.log(that.stepdate)
+                    switch ( e.keyCode ) {//当人物走动时,赋予人的img的src
+                        case 37:
+                            op.src =` img/left.png `
+                            that.moveperson( { x:-1 },person ) //人物移动传参对象为
+                            //x,y 的地标  人所走一步,位置上x,y就会有所改动
+                            //此时this指向document
+                            return false//阻止默认事件
+                            break;
+                        case 38:
+                            op.src =` img/up.png `
+                            that.moveperson( { y:-1 },person )
+                            return false
+                            break;
+                        case 39:
+                            op.src =` img/right.png `
+                            that.moveperson( { x:1 },person )
+                            return false
+                            break;
+                        case 40:
+                            op.src =` img/down.png `
+                            that.moveperson( { y:1 },person )
+                            return false
+                            break;
+                    
+                        
+                    }
+                }
+            },
+            moveperson ( myjson,person ) {//人物移动传参 一个对象 "人"的div
+                let x = myjson.x || 0 //取对象中x,有就是x 无就是0
+                let y = myjson.y || 0 //取对象中y,有就是y 无就是0
+                //计算 人的数值,意义为人在for循环中的序列号 (此时数据为按键后的数值)
+                let numP = (person.y+y) * this.size.x + person.x +x
+                let obox = document.getElementsByClassName( "box" )//取得所有box 的集合
+                //如果此时data中数值(按键后的位置的数据)不等于1,也就   不是树时,让人移动
+                if ( this.data[this.level][numP] !== 1 ) {
+                    //this.stepdate.person[ this.stepnum ] ={}
+
+                    //此数据为记录第一项人的x,y ,  记录在对象中的x,y
+                    this.stepdate.person[ this.stepnum ].x = person.x
+                    this.stepdate.person[ this.stepnum ].y = person.y
+                    
+                    //移动人
+                    person.x += x
+                    person.y += y
+                    person.style.cssText =` left:${ (person.x)*35 }px;top:${ (person.y)*35 }px `
+                    //层级变化
+                    person.style.zIndex = person.y * this.size.x + person.x
+                    //this.stepdate.person.pop()
+
+                    //此时表示第一项数据的记录完成,开始下一项
+                    this.stepnum++
+
+                    // console.log( this.stepdate.person ) 
+                    // console.log( this.stepdate.box ) 
+                    // console.log(this.stepnum)
+
+
+                    //obox.style.zIndex = obox.y * this.size.x + obox.x
+                    for (let i = 0,len = obox.length; i < len; i++) {
+                        //计算 每个box的位置(已经移动后的位置)序列号
+                        let numbox = (obox[i].y+y) * this.size.x + obox[i].x +x//块作用域 numbox 会记录每一个box 的数据
+                        //console.log(num)
+                        //obox[i].style.zIndex = obox[i].y * this.size.x + obox[i].x
+                            //console.log( obox[3].style.zIndex )
+                        if ( obox[i].x === (person.x) && obox[i].y === (person.y) ) {//只在人与box碰撞时执行
+                            //记录box的位置,,放在对象中 //因为stepnum 已经递增了,所以需要减一,记录第一项box 的位置
+                            this.stepdate.box[ this.stepnum-1 ] ={}
+                            this.stepdate.box[ this.stepnum-1 ].qiao = i //此时需要给每个box 加上自定义属性
+                            this.stepdate.box[ this.stepnum-1 ].x = obox[i].x //记录box 的x,y
+                            this.stepdate.box[ this.stepnum-1 ].y = obox[i].y
+                            
+
+                            if ( this.data[this.level][numbox] !== 1 ) {//当有box不与树重合时,才执行
+                                if ( this.boxmeet( obox[i] , x , y ) ) {//碰撞检测 box之间没有碰到为true
+                                    //在大前提(if) box 与人想同位置时,  让box移动
+                                    obox[i].x += x
+                                    obox[i].y += y
+                                    //只在box与碰撞时,才给box赋值数据  让其移动,
+                                    obox[i].style.cssText =` left:${ (obox[i].x)*35 }px;top:${ (obox[i].y)*35 }px `
+                                    obox[i].style.zIndex = obox[i].y * this.size.x + obox[i].x
+                                    //this.stepnum++
+                                //console.log( obox[i].x,obox[i].y )    
+                                //console.log( 1 )    
+                                }else{//此为box之间发生碰撞
+                                    //需要让人不移动,  就是后退   
+                                    person.x -= x
+                                    person.y -= y
+                                    person.style.cssText =` left:${ (person.x)*35 }px;top:${ (person.y)*35 }px `
+                                    person.style.zIndex = person.y * this.size.x + person.x
+                                    //因为此项记录无效,不需要保存 ,记录的项需要删减减去后一项记录的数据
+                                    this.stepnum--
+                                    this.stepdate.person.pop()
+                                }
+                            }else{//当box 即将与树重合时 人不能移动,需要后退
+                                person.x -= x
+                                person.y -= y
+                                person.style.cssText =` left:${ (person.x)*35 }px;top:${ (person.y)*35 }px `
+                                person.style.zIndex = person.y * this.size.x + person.x
+
+                                //因为此项记录无效,不需要保存 ,记录的项需要删减减去后一项记录的数据
+                                this.stepnum--
+                                this.stepdate.person.pop()
+                            }
+                            
+                        }
+                        
+                        
+                        
+                    }
+
+                    this.isok( obox )//在每次移动后执行这个函数/传入参数  box 的集合
+                    //console.log(this.stepdate)
+                }
+            },
+            boxmeet ( selfbox , x , y ) {//传入 自身的box位置 和运动时 x,y的变动值
+                let box = document.getElementsByClassName( "box" )
+                for (let i = 0,len = box.length; i <len; i++) {
+                    if ( box[i].x === selfbox.x +x && box[i].y === selfbox.y + y ) {
+                        return false//当碰撞时 返回false
+                    }
+                    return true //所以箱子都没有碰到返回true
+                }
+            },
+            stepdate : {//初始化一个对象 ,用于保存记录人\box 的位置
+                person: [],
+                box: []
+            },
+            stepnum : 0,//标记对象 人或box 中第几项
+            preve (  ) { //按键 后退
+                let that = game
+                //console.log(this) 此时this 指向preve按键
+                let newbox//定义新的box
+                //取 人(一个) 所有box
+                let persons = that.owrap.getElementsByClassName( "person" )[0]
+                let boxs = that.owrap.getElementsByClassName( "box" )
+                if ( that.stepnum != 0 ) {//从第一项数据的诞生开始
+                    //console.log(that.stepdate.person[ that.stepnum-1 ].y)
+                    //取前一项人的数据,并赋值,实现后退人的步骤
+                    persons.x = that.stepdate.person[ that.stepnum-1 ].x 
+                    persons.y = that.stepdate.person[ that.stepnum-1 ].y 
+                    persons.style.left = persons.x * 35 + "px"
+                    persons.style.top = persons.y * 35 + "px"
+                    //person的子集img (唯一)赋予src(前一个状态)
+                    persons.children[0].src = that.stepdate.person[ that.stepnum-1 ].src
+                    if ( that.stepdate.box[ that.stepnum-1 ] ) {//判断box是否存在行为,当其有记录时
+                        //因为不能拿出所有box的记录,所以根据前面所标记的属性,取到那个i项
+                        //此时的i记录的是当时人与box碰撞时的那个box
+                        newbox = boxs[ that.stepdate.box[ that.stepnum-1 ].qiao ]
+                        //赋值,实现碰撞的box的后退
+                        newbox.x = that.stepdate.box[ that.stepnum-1 ].x 
+                        newbox.y = that.stepdate.box[ that.stepnum-1 ].y 
+                        newbox.style.left = newbox.x * 35 + "px"
+                        newbox.style.top = newbox.y * 35 + "px"
+                    }
+                    //console.log(persons.x ,persons.y )
+                    that.stepnum--//上一步的数据赋予后, 上上一步就是step再减一
+                    //that.stepdate.person.pop()
+                    
+                }
+            },
+            isok ( box ) {
+                let ball = this.owrap.getElementsByClassName( "ball" )
+                let len = ball.length
+                let num = 0
+                for (let i = 0; i < len; i++) {
+                    for (let j = 0; j < len; j++) {
+                        if ( box[i].x === ball[j].x && box[i].y === ball[j].y ) {
+                            num ++//num记录box与ball重叠的个数
+                        }
+                        
+                    }
+                    
+                }
+                if ( num === len ) {//都完成时,下一关
+                    alert ( "下一关" )
+                    this.level ++
+                    this.creatMap( this.level )
+                }
+            },
+            data : [
+                [
+                //1 树 2 球 3 箱子 4 人
+
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,
+                    0,0,0,0,1,1,1,3,0,3,2,1,0,0,0,0,
+                    0,0,0,0,1,2,0,3,4,1,1,1,0,0,0,0,
+                    0,0,0,0,1,1,1,1,3,1,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+                ],[
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,
+                    0,0,0,1,1,0,1,2,1,0,0,0,0,0,0,0,
+                    0,0,0,1,2,3,0,3,1,0,0,0,0,0,0,0,
+                    0,0,0,1,1,3,0,4,1,1,0,0,0,0,0,0,
+                    0,0,0,0,1,2,0,3,0,2,1,0,0,0,0,0,
+                    0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0  
+                ],[
+
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,
+                    0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,
+                    0,0,0,0,1,0,0,0,3,0,1,0,0,0,0,0,
+                    0,0,0,1,2,3,0,4,0,0,2,1,0,0,0,0,
+                    0,0,0,1,3,0,0,0,3,0,1,0,0,0,0,0,
+                    0,0,1,2,3,0,1,1,1,2,1,0,0,0,0,0,
+                    0,0,0,1,1,0,1,0,0,1,0,0,0,0,0,0,
+                    0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+                ],
+                [
+                    0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,0,
+                    0,1,0,0,0,0,1,1,1,0,0,0,0,0,1,0,
+                    0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,
+                    0,1,0,0,1,1,1,1,1,1,1,1,0,0,1,0,
+                    1,0,1,2,0,0,0,1,1,0,0,1,0,0,1,0,
+                    1,0,0,0,0,1,0,1,1,0,0,1,0,1,0,0,
+                    1,0,0,1,0,1,0,1,1,0,0,1,0,1,0,0,
+                    0,1,2,0,0,1,0,1,1,0,0,1,0,1,0,0,
+                    1,0,0,0,0,1,0,1,1,1,1,1,0,1,0,0,
+                    1,0,0,3,1,1,3,0,0,0,0,0,0,1,0,0,
+                    1,0,1,0,0,0,0,0,2,1,0,0,0,1,0,0,
+                    1,0,1,1,1,1,1,1,0,0,0,0,0,1,0,0,
+                    1,0,0,4,0,0,3,0,0,0,1,0,0,0,1,0,
+                    1,0,0,1,1,1,1,1,0,0,1,0,0,0,1,0,
+                    0,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,
+                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                ]
+            ]
+            
+            
+
+                
+            
+            
+
+
+        }
+
+        //console.log( game.data[2].length )
+
+
+
+
+    </script>
+   
+    
+</body>
+</html>
