@@ -1,3 +1,5 @@
+[![Build Status](./svg/1.svg)](http://drone.aimdock.com/aimcheap/identity)
+
 ## 从入门到掌握 之 practice
 
 ### canvas 项目
@@ -8,3 +10,4 @@
 ### vue商城 项目
 ### react 练习
 ### react 博客练习
+
